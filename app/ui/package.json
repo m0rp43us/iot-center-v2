@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@ant-design/icons": "^4.2.2",
-    "@influxdata/giraffe": "^0.37.0",
+    "@influxdata/giraffe": "file:./../giraffe/giraffe",
     "@influxdata/influxdb-client": "^1.9.0",
     "@influxdata/influxdb-client-apis": "^1.9.0",
     "@influxdata/influxdb-client-giraffe": "^1.9.0",
@@ -16,12 +16,13 @@
     "@types/react": "^16.9.0",
     "@types/react-dom": "^16.9.0",
     "antd": "^4.6.1",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
+    "react": "file:./../giraffe/node_modules/react",
+    "react-dom": "file:./../giraffe/node_modules/react-dom",
     "react-markdown": "^4.3.1",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.3",
     "react-syntax-highlighter": "^15.4.2",
+    "s2-geometry": "^1.2.10",
     "typescript": "~3.7.2"
   },
   "scripts": {

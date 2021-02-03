@@ -1,3 +1,15 @@
+# Custom giraffe
+
+build before yarn install
+`yarn --cwd app giraffe:all`
+
+- reverting manual giraffe building 
+  - ui package original dependencies
+"react": "^16.13.1",
+"react-dom": "^16.13.1",
+"@influxdata/giraffe": "^0.37.0",
+  - ui package delete all "giraffe:*" commands 
+
 # IoT Center v2
 
 This repository contains the IoT Center application that provides a web UI that shows how to use InfluxDB v2 in various use cases. 

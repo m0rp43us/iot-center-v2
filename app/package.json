@@ -11,7 +11,10 @@
     "build": "cd ui && yarn build",
     "start": "cd server && yarn start",
     "test": "cd ui && yarn test && cd ../server && yarn test",
-    "dev": "concurrently \"yarn --cwd server dev\" \"yarn --cwd ui start\""
+    "dev": "concurrently \"yarn --cwd server dev\" \"yarn --cwd ui start\"",
+    "giraffe:all": "yarn giraffe:clone && yarn giraffe:build",
+    "giraffe:clone": "rm -rf ./giraffe && git clone https://github.com/influxdata/giraffe.git -b mapGeo --depth 1",
+    "giraffe:build": "yarn --cwd ./giraffe/giraffe install && yarn --cwd ./giraffe/giraffe build"
   },
   "devDependencies": {
     "concurrently": "^5.3.0"

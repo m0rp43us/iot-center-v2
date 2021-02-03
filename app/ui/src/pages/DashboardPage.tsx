@@ -20,6 +20,7 @@ import {
   GAUGE_THEME_LIGHT,
   GaugeLayerConfig,
   LineLayerConfig,
+  LayerConfig,
 } from '@influxdata/giraffe'
 import {
   SettingFilled,
@@ -82,7 +83,9 @@ const fetchDeviceMeasurements = async (
     |> range(start: ${fluxDuration(timeStart)})
     |> filter(fn: (r) => r._measurement == "environment")
     |> filter(fn: (r) => r.clientId == ${id})
-    |> v1.fieldsAsCols()`
+    |> v1.fieldsAsCols()
+    |> rename(columns: {Lat: "lat", Lon: "lon"})
+    `
   )
   return result
 }
@@ -394,6 +397,61 @@ const DashboardPage: FunctionComponent<
     </>
   )
 
+  const geo = deviceData?.measurementsTable?.length ? (() => {
+    const table = deviceData.measurementsTable as GiraffeTable
+    const lat = table?.getColumn("Lat", "number")?.[0] ?? 0;
+    const lon = table?.getColumn("Lon", "number")?.[0] ?? 0;
+    const config: LayerConfig = {
+      type: "geo",
+      allowPanAndZoom: true,
+      lat,
+      lon,
+      zoom: 10,
+      detectCoordinateFields: false,
+      layers: [
+        {
+          type: 'trackMap',
+          trackWidth: 10,
+          endStopMarkers: false,
+        },
+        {
+          type: 'pointMap',
+          isClustered: true,
+        }
+      ],
+      tileServerConfiguration: {
+        // The code here is for Giraffe demo purposes only, do not use it in your own
+        // projects. To get a bing maps API key, go to:
+        //
+        // https://docs.microsoft.com/en-us/bingmaps/getting-started/bing-maps-dev-center-help/getting-a-bing-maps-key
+        bingKey: 'AtqWbnKXzGMWSAsgWknAw2cgBKuGIm9XmSbaS4fSebC5U6BdDTUF3I__u5NAp_Zi',
+      },
+    }
+
+    return (<>
+      <Row>
+        <Col sm={24} >
+          <div
+            style={{
+              width: '95%',
+              height: '500px',
+              margin: "0 2.5%"
+            }}
+          >
+            <Plot
+              config={{
+                table,
+                showAxes: false,
+                layers: [config],
+              }}
+            />
+          </div>
+        </Col>
+      </Row>
+      <Divider />
+    </>)
+  })() : undefined
+
   const renderPlot = (
     lineDefinition: Partial<LineLayerConfig> | undefined,
     table: GiraffeTable,
@@ -428,7 +486,7 @@ const DashboardPage: FunctionComponent<
   }
 
   const plots =
-    deviceData?.measurementsTable?.length &&
+    deviceData?.measurementsTable?.length ?
     (() => {
       const table = deviceData.measurementsTable as GiraffeTable
       const measurementsWithValues = measurementsDefinitions.filter(
@@ -460,7 +518,7 @@ const DashboardPage: FunctionComponent<
           ) : undefined}
         </>
       )
-    })()
+      })() : undefined
 
   const timeOptions: {label: string; value: string}[] = [
     {label: 'Past 5m', value: '-5m'},
@@ -550,6 +608,7 @@ const DashboardPage: FunctionComponent<
       {deviceData?.measurementsTable?.length ? (
         <>
           {gauges}
+          {geo}
           {plots}
         </>
       ) : (

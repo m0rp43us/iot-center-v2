@@ -27,6 +27,7 @@ import {
   ReloadOutlined,
 } from '@ant-design/icons'
 import Table, {ColumnsType} from 'antd/lib/table'
+import { S2 } from 's2-geometry'
 
 interface DeviceConfig {
   influx_url: string
@@ -89,6 +90,7 @@ from(bucket: ${bucket})
   |> range(start: -30d)
   |> filter(fn: (r) => r._measurement == "environment")
   |> filter(fn: (r) => r.clientId == ${id})
+  |> filter(fn: (r) => r._field != "s2_cell_id")
   |> toFloat()
   |> group(columns: ["_field"])
   |> reduce(
@@ -113,7 +115,7 @@ from(bucket: ${bucket})
   measurements.forEach((x) => {
     const {_field} = x
     const senosorTagName =
-      (_field === 'Lat' || _field == 'Lon' ? 'GPS' : _field) + 'Sensor'
+      (_field === 'Lat' || _field === 'Lon' ? 'GPS' : _field) + 'Sensor'
     x.sensor = sensors?.[0]?.[senosorTagName] ?? ''
   })
   return {config, measurements}
@@ -138,10 +140,10 @@ async function writeEmulatedData(
   if (lastTime < toTime - 30 * 24 * 60 * 60 * 1000) {
     lastTime = toTime - 30 * 24 * 60 * 60 * 1000
   }
-  const getGPX = generateGPXData.bind(undefined, await fetchGPXData())
   const totalPoints = Math.trunc((toTime - lastTime) / 60_000)
   let pointsWritten = 0
   if (totalPoints > 0) {
+    const getGPX = generateGPXData.bind(undefined, await fetchGPXData())
     const batchSize = 2000
     const influxDB = new InfluxDB({url: '/influx', token})
     const writeApi = influxDB.getWriteApi(org, bucket, 'ms', {
@@ -155,14 +157,18 @@ async function writeEmulatedData(
       while (lastTime < toTime) {
         lastTime += 60_000 // emulate next minute
         const gpx = getGPX(lastTime)
+        const lat = gpx[0] || state.config.default_lat || 50.0873254
+        const lon = gpx[1] || state.config.default_lon || 14.4071543
+        const s2_hex_id = (+S2.keyToId(S2.latLngToKey(lat, lon, 11))).toString(16)
         point
           .floatField('Temperature', generateTemperature(lastTime))
           .floatField('Humidity', generateHumidity(lastTime))
           .floatField('Pressure', generatePressure(lastTime))
           .intField('CO2', generateCO2(lastTime))
           .intField('TVOC', generateTVOC(lastTime))
-          .floatField('Lat', gpx[0] || state.config.default_lat || 50.0873254)
-          .floatField('Lon', gpx[1] || state.config.default_lon || 14.4071543)
+          .floatField('Lat', lat)
+          .floatField('Lon', lon)
+          .stringField('s2_cell_id', s2_hex_id)
           .tag('TemperatureSensor', 'virtual_TemperatureSensor')
           .tag('HumiditySensor', 'virtual_HumiditySensor')
           .tag('PressureSensor', 'virtual_PressureSensor')
