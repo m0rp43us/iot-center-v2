@@ -30,7 +30,7 @@ function logEnvironment() {
     console.log(`KAFKA_HOST=${KAFKA_HOST}`)
   }
   if (KAFKA_TOPIC) {
-    console.log(`KAFKA_HOST=${KAFKA_HOST}`)
+    console.log(`KAFKA_TOPIC=${KAFKA_TOPIC}`)
   }
 }
 
