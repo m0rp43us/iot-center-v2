@@ -115,7 +115,7 @@ from(bucket: ${bucket})
   measurements.forEach((x) => {
     const {_field} = x
     const senosorTagName =
-      (_field === 'Lat' || _field == 'Lon' ? 'GPS' : _field) + 'Sensor'
+      (_field === 'Lat' || _field === 'Lon' ? 'GPS' : _field) + 'Sensor'
     x.sensor = sensors?.[0]?.[senosorTagName] ?? ''
   })
   return {config, measurements}
