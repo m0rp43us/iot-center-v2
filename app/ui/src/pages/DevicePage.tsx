@@ -36,6 +36,7 @@ interface DeviceConfig {
   id: string
   default_lat?: number
   default_lon?: number
+  kafka_url?: string
   createdAt: string
 }
 interface measurementSummaryRow {
@@ -129,6 +130,7 @@ async function writeEmulatedData(
     influx_token: token,
     influx_org: org,
     influx_bucket: bucket,
+    kafka_url,
     id,
   } = state.config
   // calculate window to emulate writes
@@ -144,7 +146,8 @@ async function writeEmulatedData(
   let pointsWritten = 0
   if (totalPoints > 0) {
     const batchSize = 2000
-    const influxDB = new InfluxDB({url: '/influx', token})
+    const apiBase = kafka_url ? '/kafka' : '/influx'
+    const influxDB = new InfluxDB({url: apiBase, token})
     const writeApi = influxDB.getWriteApi(org, bucket, 'ms', {
       batchSize: batchSize + 1,
       defaultTags: {clientId: id},
