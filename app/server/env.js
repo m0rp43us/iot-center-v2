@@ -7,6 +7,9 @@ const INFLUX_ORG = process.env.INFLUX_ORG || 'my-org'
 /** InfluxDB bucket  */
 const INFLUX_BUCKET = 'iot_center'
 
+/** KAFKA URL - optional URL to Kafka */
+const KAFKA_URL = ''
+
 // Defaults when on boarding a fresh new InfluxDB instance
 /** InfluxDB user  */
 const onboarding_username = 'my-user'
@@ -27,6 +30,7 @@ module.exports = {
   INFLUX_URL,
   INFLUX_TOKEN,
   INFLUX_ORG,
+  KAFKA_URL,
   onboarding_username,
   onboarding_password,
   configuration_refresh,
