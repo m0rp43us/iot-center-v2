@@ -19,13 +19,12 @@ if (KAFKA_HOST && KAFKA_TOPIC) {
     console.log('Consuming messages')
     await consumer.run({
       eachMessage: async ({message}) => {
-        console.log({
-          value: message.value.toString(),
-          headers: message.headers,
-        })
+        console.log(
+          `${message.value.toString().split('\n').length} lines received`
+        )
       },
     })
-  })().catch(console.error())
+  })().catch(console.error)
 } else {
   console.log('Please specify both KAFKA_HOST and KAFKA_TOPIC')
 }
