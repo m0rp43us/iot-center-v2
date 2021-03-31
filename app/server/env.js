@@ -8,7 +8,7 @@ const INFLUX_ORG = process.env.INFLUX_ORG || 'my-org'
 const INFLUX_BUCKET = 'iot_center'
 
 /** KAFKA URL - optional URL to Kafka */
-const KAFKA_URL = ''
+const KAFKA_URL = process.env.KAFKA_URL || ''
 
 // Defaults when on boarding a fresh new InfluxDB instance
 /** InfluxDB user  */
