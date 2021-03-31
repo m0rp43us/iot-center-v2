@@ -1,6 +1,6 @@
 const express = require('express')
 const {KAFKA_HOST, KAFKA_TOPIC} = require('../env')
-const {Kafka} = require('kafkajs')
+const {Kafka, CompressionTypes} = require('kafkajs')
 
 // create kafka producer
 let kafka
@@ -32,6 +32,7 @@ router.post('/api/v2/write', async (req, res) => {
       key: 'mykey',
       topic: KAFKA_TOPIC,
       messages: [{value: influxLineProtocolData}],
+      compression: CompressionTypes.GZIP,
     })
     console.log('message sent')
   } catch (e) {
