@@ -146,8 +146,8 @@ async function writeEmulatedData(
   let pointsWritten = 0
   if (totalPoints > 0) {
     const batchSize = 2000
-    const apiBase = kafka_write_enabled ? '/kafka' : '/influx'
-    const influxDB = new InfluxDB({url: apiBase, token})
+    const url = kafka_write_enabled ? '/kafka' : '/influx'
+    const influxDB = new InfluxDB({url, token})
     const writeApi = influxDB.getWriteApi(org, bucket, 'ms', {
       batchSize: batchSize + 1,
       defaultTags: {clientId: id},
