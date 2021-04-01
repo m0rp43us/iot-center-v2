@@ -72,6 +72,7 @@ router.get(
       updatedAt: authorization.updatedAt,
       serverTime: new Date().toISOString(),
       configuration_refresh: env.configuration_refresh,
+      kafka_write_enabled: !!(env.KAFKA_HOST && env.KAFKA_TOPIC),
     }
     res.json(result)
   })

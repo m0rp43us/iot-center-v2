@@ -36,6 +36,7 @@ interface DeviceConfig {
   id: string
   default_lat?: number
   default_lon?: number
+  kafka_write_enabled?: boolean
   createdAt: string
 }
 interface measurementSummaryRow {
@@ -114,7 +115,7 @@ from(bucket: ${bucket})
   measurements.forEach((x) => {
     const {_field} = x
     const senosorTagName =
-      (_field === 'Lat' || _field == 'Lon' ? 'GPS' : _field) + 'Sensor'
+      (_field === 'Lat' || _field === 'Lon' ? 'GPS' : _field) + 'Sensor'
     x.sensor = sensors?.[0]?.[senosorTagName] ?? ''
   })
   return {config, measurements}
@@ -129,6 +130,7 @@ async function writeEmulatedData(
     influx_token: token,
     influx_org: org,
     influx_bucket: bucket,
+    kafka_write_enabled,
     id,
   } = state.config
   // calculate window to emulate writes
@@ -144,7 +146,8 @@ async function writeEmulatedData(
   let pointsWritten = 0
   if (totalPoints > 0) {
     const batchSize = 2000
-    const influxDB = new InfluxDB({url: '/influx', token})
+    const url = kafka_write_enabled ? '/kafka' : '/influx'
+    const influxDB = new InfluxDB({url, token})
     const writeApi = influxDB.getWriteApi(org, bucket, 'ms', {
       batchSize: batchSize + 1,
       defaultTags: {clientId: id},

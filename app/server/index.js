@@ -3,6 +3,7 @@ const path = require('path')
 const proxy = require('express-http-proxy')
 
 const apis = require('./apis')
+const kafka = require('./kafka')
 const onboardInfluxDB = require('./influxdb/onboarding')
 const {logEnvironment, INFLUX_URL} = require('./env')
 const monitor = require('./monitor')
@@ -15,6 +16,9 @@ async function startApplication() {
 
   // APIs
   app.use('/api', apis)
+
+  // Kafka write
+  app.use('/kafka', kafka)
 
   // start proxy to InfluxDB to avoid CORS blocking with InfluXDB OSS v2 Beta
   app.use('/influx', proxy(INFLUX_URL))

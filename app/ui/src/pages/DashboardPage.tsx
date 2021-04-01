@@ -33,11 +33,6 @@ import {flux, fluxDuration, InfluxDB} from '@influxdata/influxdb-client'
 import {queryTable} from '../util/queryTable'
 import {VIRTUAL_DEVICE} from '../App'
 
-const zip = <T1, T2>(arr1: T1[], arr2: T2[]): [T1, T2][] =>
-  arr1.map((x, i) => [x, arr2[i]])
-
-const last = <T,>(arr: T[]) => arr[arr.length - 1]
-
 interface DeviceConfig {
   influx_url: string
   influx_org: string
