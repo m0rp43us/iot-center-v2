@@ -2,7 +2,7 @@ const express = require('express')
 const {KAFKA_HOST, KAFKA_TOPIC} = require('../env')
 const {Kafka, CompressionTypes} = require('kafkajs')
 
-// create kafka producer
+// create kafka client
 let kafka
 if (KAFKA_HOST && KAFKA_TOPIC) {
   console.log('Initializing Kafka client')
@@ -15,7 +15,7 @@ if (KAFKA_HOST && KAFKA_TOPIC) {
 const router = express.Router()
 // bigger bodies are expected
 router.use(express.text({limit: '10mb'}))
-// write endpoint that writes data to Kafka
+// register an InfluxDB-compatible write endpoint forwards data to Kafka
 router.post('/api/v2/write', async (req, res) => {
   if (!kafka) {
     res.status(500)
@@ -25,16 +25,13 @@ router.post('/api/v2/write', async (req, res) => {
   const influxLineProtocolData = req.body
   try {
     const producer = kafka.producer()
-    console.log('connecting')
     await producer.connect()
-    console.log('sending')
     await producer.send({
       key: 'mykey',
       topic: KAFKA_TOPIC,
       messages: [{value: influxLineProtocolData}],
       compression: CompressionTypes.GZIP,
     })
-    console.log('message sent')
   } catch (e) {
     res.status(500)
     res.end('Kafka producer error: ' + e)
